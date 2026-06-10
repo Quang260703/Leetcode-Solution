@@ -1,5 +1,4 @@
 name: Sync Leetcode
-
 on:
   workflow_dispatch:
   schedule:
@@ -8,9 +7,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Sync
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Sync to branch
         uses: joshcai/leetcode-sync@v1.7
         with:
           github-token: ${{ github.token }}
@@ -19,3 +20,17 @@ jobs:
           destination-folder: my-folder
           verbose: true
           commit-header: "[LeetCode Sync]"
+          branch: leetcode-sync
+
+      - name: Open Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ github.token }}
+          branch: leetcode-sync
+          base: main
+          title: "[LeetCode Sync] Weekly Solutions"
+          body: |
+            Automated weekly sync of accepted LeetCode solutions.
+            Review and merge to add to main.
+          commit-message: "[LeetCode Sync] Weekly update"
+          labels: leetcode, automated
